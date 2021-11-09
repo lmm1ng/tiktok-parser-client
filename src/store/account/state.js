@@ -1,4 +1,7 @@
 export default {
   accountUsers: [],
-  isUserAddLoading: false
+  isAccountUsersLoading: false,
+  isUserAddLoading: false,
+  userInfo: {},
+  isUserInfoLoading: false
 }

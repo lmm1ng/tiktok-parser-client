@@ -15,5 +15,14 @@ export default {
         ...requestData
       }
     })
+  },
+  getUserInfo (requestData) {
+    return request({
+      method: 'GET',
+      url: '/api/account/user',
+      params: {
+        ...requestData
+      }
+    })
   }
 }

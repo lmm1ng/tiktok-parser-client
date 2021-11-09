@@ -1,7 +1,7 @@
 <template>
-  <div class="users-wrapper">
+  <div class="users-wrapper" v-if="!isAccountUsersLoading">
     <v-dialog v-model="isAddUserModal" width="500" @click:outside="onDialogClose">
-      <v-card width="500" class="pa-4">
+      <v-card width="500" class="pa-4" :loading="isUserAddLoading">
         <v-card-title>Добавление пользователя</v-card-title>
         <v-form @submit.prevent="onUserFind">
           <v-text-field label="Имя пользователя" v-model="findUserInputValue"/>
@@ -9,7 +9,7 @@
         </v-form>
         <div v-if="getTiktokUsers">
           <v-card class="my-2" v-for="tiktokUser in getTiktokUsers" :key="tiktokUser.userId"
-                  @click="addUser(tiktokUser.uniqueId)" :loading="isUserAddLoading">
+                  @click="addUser(tiktokUser.uniqueId)" :disabled="isUserAddLoading">
             <v-card-title>
               {{ tiktokUser.nickname }}
             </v-card-title>
@@ -20,7 +20,8 @@
         </div>
       </v-card>
     </v-dialog>
-    <v-card v-for="user in getAccountUsers" :key="user.userId" width="400" height="300" elevation="6">
+    <v-card v-for="user in getAccountUsers" :key="user.userId" @click="onUserCard(user.uniqueId)" width="400"
+            height="300" elevation="6">
       <v-card-title>
         {{ `${user.nickname}` }}
       </v-card-title>
@@ -54,6 +55,12 @@
       <v-icon x-large>mdi-plus-thick</v-icon>
     </v-card>
   </div>
+  <v-overlay v-else :value="isAccountUsersLoading">
+    <v-progress-circular
+      indeterminate
+      size="64"
+    ></v-progress-circular>
+  </v-overlay>
 </template>
 
 <script>
@@ -68,7 +75,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('account', ['getAccountUsers', 'isUserAddLoading']),
+    ...mapGetters('account', ['getAccountUsers', 'isUserAddLoading', 'isAccountUsersLoading']),
     ...mapGetters('tiktok', ['getTiktokUsers', 'isTiktokUsersLoading'])
   },
   methods: {
@@ -76,9 +83,6 @@ export default {
     ...mapActions('tiktok', ['fetchTiktokUsersByUsername']),
     ...mapMutations('tiktok', ['setTiktokUsers']),
     getLastSnapshotData (user, field) {
-      if (field === 'createdAt') {
-        return user.snapshots.length ? this.getPrettyDate(new Date(user.snapshots[0][field])) : '?'
-      }
       return user.snapshots.length ? user.snapshots[0][field] : '?'
     },
     onUserFind () {
@@ -96,8 +100,11 @@ export default {
     setDialogVision (value) {
       this.isAddUserModal = value
     },
-    getPrettyDate (date) {
-      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`
+    onUserCard (username) {
+      this.$router.push({
+        name: 'User',
+        params: { username }
+      })
     }
   },
   mounted () {

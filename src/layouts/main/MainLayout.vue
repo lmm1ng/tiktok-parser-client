@@ -7,7 +7,7 @@
         </v-list-item-title>
       </v-list-item>
       <v-divider/>
-      <v-list-item v-for="item in sidebarItems" :key="item.title" link>
+      <v-list-item v-for="item in sidebarItems" :key="item.title" link :to="item.href">
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
@@ -32,7 +32,8 @@ export default {
       sidebarItems: [
         {
           title: 'Пользователи',
-          icon: 'mdi-account-search'
+          icon: 'mdi-account-search',
+          href: '/users'
         }
       ]
     }
